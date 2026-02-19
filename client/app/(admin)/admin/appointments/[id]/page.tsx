@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useAppointment, useAppointmentMutations } from "@/hooks/useAppointments";
 import { useDoctors } from "@/hooks/useDoctors";
 
-export default function AdminAppointmentEditPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useAppointment(params.id);
+export default function AdminAppointmentEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useAppointment(id);
   const { data: doctors } = useDoctors();
   const { update } = useAppointmentMutations();
 
@@ -32,7 +33,7 @@ export default function AdminAppointmentEditPage({ params }: { params: { id: str
       className="space-y-3 rounded-lg border border-slate-200 bg-white p-5"
       onSubmit={async (event) => {
         event.preventDefault();
-        await update.mutateAsync({ id: params.id, payload: { doctor: initialDoctor, date: new Date(initialDate).toISOString(), status: initialStatus, notes: initialNotes } });
+        await update.mutateAsync({ id, payload: { doctor: initialDoctor, date: new Date(initialDate).toISOString(), status: initialStatus, notes: initialNotes } });
       }}
     >
       <h1 className="text-2xl font-semibold">Edit Appointment</h1>

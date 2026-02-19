@@ -1,9 +1,11 @@
 "use client";
 
+import { use } from "react";
 import { useBlogPost } from "@/hooks/useBlog";
 
-export default function BlogDetailsPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useBlogPost(params.id);
+export default function BlogDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useBlogPost(id);
 
   if (isLoading) {
     return <p className="text-slate-600">Loading article...</p>;

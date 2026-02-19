@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useBlogMutations, useBlogPost } from "@/hooks/useBlog";
 
-export default function AdminBlogEditPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useBlogPost(params.id);
+export default function AdminBlogEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useBlogPost(id);
   const { update } = useBlogMutations();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -25,7 +26,7 @@ export default function AdminBlogEditPage({ params }: { params: { id: string } }
       className="space-y-3 rounded-lg border border-slate-200 bg-white p-5"
       onSubmit={async (event) => {
         event.preventDefault();
-        await update.mutateAsync({ id: params.id, payload: { title: initialTitle, content: initialContent } });
+        await update.mutateAsync({ id, payload: { title: initialTitle, content: initialContent } });
       }}
     >
       <h1 className="text-2xl font-semibold">Edit Blog Post</h1>

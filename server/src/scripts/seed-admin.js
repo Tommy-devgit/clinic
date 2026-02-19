@@ -6,9 +6,9 @@ import { User } from "../models/User.js";
 dotenv.config();
 
 const mongoUri = process.env.MONGODB_URI;
-const email = process.env.ADMIN_EMAIL || "admin@roha-hospital.com";
-const password = process.env.ADMIN_PASSWORD || "Admin12345!";
-const name = process.env.ADMIN_NAME || "Roha Admin";
+const email = process.env.ADMIN_EMAIL;
+const password = process.env.ADMIN_PASSWORD;
+const name = process.env.ADMIN_NAME;
 
 async function seedAdmin() {
   if (!mongoUri) {

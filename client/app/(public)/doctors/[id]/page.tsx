@@ -1,9 +1,11 @@
 "use client";
 
+import { use } from "react";
 import { useDoctor } from "@/hooks/useDoctors";
 
-export default function DoctorDetailsPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useDoctor(params.id);
+export default function DoctorDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useDoctor(id);
 
   if (isLoading) {
     return <p className="text-slate-600">Loading doctor profile...</p>;

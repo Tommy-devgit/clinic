@@ -1,9 +1,11 @@
 "use client";
 
+import { use } from "react";
 import { useDepartment } from "@/hooks/useDepartments";
 
-export default function DepartmentDetailsPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useDepartment(params.id);
+export default function DepartmentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useDepartment(id);
 
   if (isLoading) {
     return <p className="text-slate-600">Loading department details...</p>;

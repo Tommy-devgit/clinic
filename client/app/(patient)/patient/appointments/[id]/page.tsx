@@ -1,10 +1,12 @@
 "use client";
 
+import { use } from "react";
 import { formatAppointmentDate } from "@/lib/date";
 import { useAppointment } from "@/hooks/useAppointments";
 
-export default function PatientAppointmentDetailsPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useAppointment(params.id);
+export default function PatientAppointmentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useAppointment(id);
 
   if (isLoading) {
     return <p className="text-slate-600">Loading appointment...</p>;

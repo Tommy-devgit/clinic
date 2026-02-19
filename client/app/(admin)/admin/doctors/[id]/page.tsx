@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useDepartments } from "@/hooks/useDepartments";
 import { useDoctor, useDoctorMutations } from "@/hooks/useDoctors";
 
-export default function AdminDoctorEditPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useDoctor(params.id);
+export default function AdminDoctorEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useDoctor(id);
   const { data: departments } = useDepartments();
   const { update } = useDoctorMutations();
 
@@ -32,7 +33,7 @@ export default function AdminDoctorEditPage({ params }: { params: { id: string }
       className="space-y-3 rounded-lg border border-slate-200 bg-white p-5"
       onSubmit={async (event) => {
         event.preventDefault();
-        await update.mutateAsync({ id: params.id, payload: { name: initialName, specialty: initialSpecialty, department: initialDepartment || undefined, bio: initialBio } });
+        await update.mutateAsync({ id, payload: { name: initialName, specialty: initialSpecialty, department: initialDepartment || undefined, bio: initialBio } });
       }}
     >
       <h1 className="text-2xl font-semibold">Edit Doctor</h1>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useDepartment, useDepartmentMutations } from "@/hooks/useDepartments";
 
-export default function AdminDepartmentEditPage({ params }: { params: { id: string } }) {
-  const { data, isLoading, isError } = useDepartment(params.id);
+export default function AdminDepartmentEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading, isError } = useDepartment(id);
   const { update } = useDepartmentMutations();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -25,7 +26,7 @@ export default function AdminDepartmentEditPage({ params }: { params: { id: stri
       className="space-y-3 rounded-lg border border-slate-200 bg-white p-5"
       onSubmit={async (event) => {
         event.preventDefault();
-        await update.mutateAsync({ id: params.id, payload: { name: initialName, description: initialDescription } });
+        await update.mutateAsync({ id, payload: { name: initialName, description: initialDescription } });
       }}
     >
       <h1 className="text-2xl font-semibold">Edit Department</h1>
