@@ -115,3 +115,20 @@ export async function logout(req, res, next) {
     return next(error);
   }
 }
+
+export async function me(req, res, next) {
+  try {
+    const user = await User.findById(req.user.sub).select("name email role");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
