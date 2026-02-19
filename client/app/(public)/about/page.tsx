@@ -1,3 +1,8 @@
+"use client";
+
+import { useDepartments } from "@/hooks/useDepartments";
+import { useDoctors } from "@/hooks/useDoctors";
+
 const values = [
   {
     title: "Patient Safety First",
@@ -14,13 +19,30 @@ const values = [
 ];
 
 export default function AboutPage() {
+  const { data: departments } = useDepartments();
+  const { data: doctors } = useDoctors();
+
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
-        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">About Roha Hospital</h1>
-        <p className="mt-3 max-w-4xl text-slate-700">
-          Roha Hospital is a multidisciplinary care center delivering emergency, surgical, medical, and preventive services. We combine experienced clinicians, robust nursing standards, and digital systems to provide reliable care from first visit to recovery.
+      <section className="relative overflow-hidden rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-900 to-cyan-800 p-6 text-white sm:p-8">
+        <h1 className="text-3xl font-bold sm:text-4xl">About Roha Hospital</h1>
+        <p className="mt-3 max-w-4xl text-sm text-cyan-100 sm:text-base">
+          Roha Hospital is a multidisciplinary care center delivering emergency, surgical, medical, and preventive services with strong clinical governance and a patient-first model.
         </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+          <div className="rounded-lg border border-white/20 bg-white/10 p-4">
+            <p className="text-xs uppercase tracking-wide text-cyan-100">Active Departments</p>
+            <p className="mt-1 text-2xl font-bold">{departments?.length ?? 0}</p>
+          </div>
+          <div className="rounded-lg border border-white/20 bg-white/10 p-4">
+            <p className="text-xs uppercase tracking-wide text-cyan-100">Specialist Doctors</p>
+            <p className="mt-1 text-2xl font-bold">{doctors?.length ?? 0}</p>
+          </div>
+          <div className="rounded-lg border border-white/20 bg-white/10 p-4">
+            <p className="text-xs uppercase tracking-wide text-cyan-100">Emergency Coverage</p>
+            <p className="mt-1 text-2xl font-bold">24/7</p>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">

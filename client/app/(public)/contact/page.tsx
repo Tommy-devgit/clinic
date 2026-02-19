@@ -1,9 +1,18 @@
+"use client";
+
+import { useDoctors } from "@/hooks/useDoctors";
+
 export default function ContactPage() {
+  const { data: doctors } = useDoctors();
+
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
-        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Contact Roha Hospital</h1>
-        <p className="mt-2 text-slate-600">For appointments, admissions, reports, and support, reach us through the channels below.</p>
+      <section className="rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-900 to-cyan-800 p-6 text-white sm:p-8">
+        <h1 className="text-3xl font-bold sm:text-4xl">Contact Roha Hospital</h1>
+        <p className="mt-2 text-cyan-100">For appointments, admissions, reports, and support, reach us through the channels below.</p>
+        <div className="mt-4 inline-flex rounded-md border border-white/20 bg-white/10 px-4 py-2 text-sm">
+          On-duty specialist pool: {doctors?.length ?? 0} doctors
+        </div>
       </section>
 
       <div className="grid gap-6 md:grid-cols-2">

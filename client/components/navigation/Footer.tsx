@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-slate-200 bg-slate-950 text-slate-200">
+    <footer className="border-t border-slate-200 bg-slate-950 text-slate-200">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-4">
         <div className="space-y-2">
           <h2 className="text-lg font-semibold text-white">Roha Hospital</h2>

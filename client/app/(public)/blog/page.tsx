@@ -14,15 +14,29 @@ export default function BlogPage() {
     return <p className="text-red-600">Unable to load blog posts right now.</p>;
   }
 
+  const featured = data?.[0];
+
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
-        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Roha Health Journal</h1>
-        <p className="mt-2 text-slate-600">Guides, preventive care tips, and medical updates from Roha Hospital teams.</p>
+      <section className="rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-900 to-cyan-800 p-6 text-white sm:p-8">
+        <h1 className="text-3xl font-bold sm:text-4xl">Roha Health Journal</h1>
+        <p className="mt-2 text-cyan-100">Guides, preventive care tips, and medical updates from Roha Hospital teams.</p>
+        <p className="mt-4 text-sm font-semibold text-cyan-100">Published articles: {data?.length ?? 0}</p>
       </section>
 
+      {featured ? (
+        <article className="rounded-xl border border-slate-200 bg-white p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Featured</p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-900">{featured.title}</h2>
+          <p className="mt-2 max-h-20 overflow-hidden text-sm text-slate-600">{featured.content}</p>
+          <Link href={`/blog/${featured._id}`} className="mt-3 inline-block text-sm font-medium text-sky-700 hover:text-sky-800">
+            Read featured article
+          </Link>
+        </article>
+      ) : null}
+
       <div className="grid gap-4">
-        {data?.map((post) => (
+        {data?.slice(1).map((post) => (
           <article key={post._id} className="rounded-xl border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold text-slate-900">{post.title}</h2>
             <p className="mt-2 max-h-16 overflow-hidden text-sm text-slate-600">{post.content}</p>

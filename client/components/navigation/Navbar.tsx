@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const links = [
   { href: "/about", label: "About" },
@@ -12,7 +15,23 @@ const links = [
 ];
 
 export function Navbar() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { user, initialized, setUser } = useAuthContext();
+  const { logout } = useAuth();
+
+  const portalHref = user?.role === "admin" ? "/admin/dashboard" : "/patient/dashboard";
+  const badgeLabel = user ? `${user.role.toUpperCase()}: ${user.name}` : null;
+
+  async function handleLogout() {
+    try {
+      await logout.mutateAsync();
+    } finally {
+      setUser(null);
+      setOpen(false);
+      router.push("/");
+    }
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur">
@@ -40,9 +59,29 @@ export function Navbar() {
           <Link href="/appointment" className="rounded-md bg-sky-700 px-3 py-1.5 text-white transition hover:bg-sky-800">
             Book Appointment
           </Link>
-          <Link href="/login" className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition hover:border-sky-300 hover:text-sky-800">
-            Login
-          </Link>
+
+          {initialized && user ? (
+            <>
+              <span className="rounded-md border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-800">
+                {badgeLabel}
+              </span>
+              <Link href={portalHref} className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition hover:border-sky-300 hover:text-sky-800">
+                Dashboard
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-md border border-red-300 px-3 py-1.5 text-red-700 transition hover:bg-red-50"
+                disabled={logout.isPending}
+              >
+                {logout.isPending ? "Signing out..." : "Logout"}
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition hover:border-sky-300 hover:text-sky-800">
+              Login
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -66,13 +105,37 @@ export function Navbar() {
             >
               Book Appointment
             </Link>
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-center text-slate-700 transition hover:border-sky-300 hover:text-sky-800"
-            >
-              Login
-            </Link>
+
+            {initialized && user ? (
+              <>
+                <span className="rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-center text-xs font-semibold text-sky-800">
+                  {badgeLabel}
+                </span>
+                <Link
+                  href={portalHref}
+                  onClick={() => setOpen(false)}
+                  className="rounded-md border border-slate-300 px-3 py-2 text-center text-slate-700 transition hover:border-sky-300 hover:text-sky-800"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-md border border-red-300 px-3 py-2 text-red-700 transition hover:bg-red-50"
+                  disabled={logout.isPending}
+                >
+                  {logout.isPending ? "Signing out..." : "Logout"}
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="rounded-md border border-slate-300 px-3 py-2 text-center text-slate-700 transition hover:border-sky-300 hover:text-sky-800"
+              >
+                Login
+              </Link>
+            )}
           </div>
         </div>
       ) : null}
