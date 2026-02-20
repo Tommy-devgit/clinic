@@ -27,7 +27,7 @@ const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000")
 // SECURITY HEADERS
 app.use(helmet());
 
-// CORS - allow credentials and preflight
+// CORS - handled here + in catch-all for redundancy/safety
 app.use(
   cors({
     origin: allowedOrigins,
@@ -41,7 +41,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(apiRateLimiter);
 
-// HEALTH CHECK
+// HEALTH CHECK & ROOT
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
@@ -50,16 +50,16 @@ app.get("/", (_req, res) => {
   res.json({ status: "ok", service: "Roha Hospital Backend", basePath: "/api" });
 });
 
-// API ROUTES
-app.use("/api/auth", authRoutes);
-app.use("/api/departments", departmentRoutes);
-app.use("/api/doctors", doctorRoutes);
-app.use("/api/appointments", appointmentRoutes);
-app.use("/api/patients", patientRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/blog", blogRoutes);
+// API ROUTES – IMPORTANT: no /api prefix anymore (handled by catch-all rewrite)
+app.use("/auth", authRoutes);
+app.use("/departments", departmentRoutes);
+app.use("/doctors", doctorRoutes);
+app.use("/appointments", appointmentRoutes);
+app.use("/patients", patientRoutes);
+app.use("/admin", adminRoutes);
+app.use("/blog", blogRoutes);
 
-// ERROR HANDLER
+// ERROR HANDLER (must be last)
 app.use(errorHandler);
 
 export default app;
