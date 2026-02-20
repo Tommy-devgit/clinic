@@ -10,27 +10,30 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  // Ensure DB connection
+  // CONNECT DATABASE ON FIRST REQUEST
   if (!databaseReady) {
     await connectDatabase();
     databaseReady = true;
   }
 
-  // Handle CORS preflight requests (OPTIONS)
+  // CORS HEADERS FOR VERCEL
+  const allowedOrigin = "https://rohahospitalmanagement.vercel.app"; // frontend URL
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type,Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  // HANDLE PRE-FLIGHT
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_ORIGIN);
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,POST,PUT,DELETE,OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type,Authorization"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", "true");
     return res.status(200).end();
   }
 
-  // Pass everything else to Express
+  // PASS REQUEST TO EXPRESS
   return app(req, res);
 }

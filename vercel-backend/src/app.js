@@ -1,11 +1,12 @@
+import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import express from "express";
 import helmet from "helmet";
 
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { apiRateLimiter } from "./middlewares/rate-limit.middleware.js";
+
 import adminRoutes from "./routes/admin.routes.js";
 import appointmentRoutes from "./routes/appointment.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -18,67 +19,38 @@ dotenv.config();
 
 const app = express();
 
-/* ==============================
-   CORS CONFIGURATION
-============================== */
-
-const allowedOrigins = (process.env.CLIENT_ORIGIN ||
-  "http://localhost:3000")
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+// SECURITY HEADERS
+app.use(helmet());
+
+// CORS - allow credentials and preflight
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow non-browser tools (Postman, curl)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      // Do NOT throw error — just reject silently
-      return callback(null, false);
-    },
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// Explicitly handle preflight requests
-app.options("*", cors());
-
-/* ==============================
-   MIDDLEWARE
-============================== */
-
-app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(apiRateLimiter);
 
-/* ==============================
-   HEALTH CHECKS
-============================== */
-
+// HEALTH CHECK
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
 app.get("/", (_req, res) => {
-  res.json({
-    status: "ok",
-    service: "Roha Hospital Backend",
-    basePath: "/api",
-  });
+  res.json({ status: "ok", service: "Roha Hospital Backend", basePath: "/api" });
 });
 
-/* ==============================
-   API ROUTES
-============================== */
-
+// API ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/doctors", doctorRoutes);
@@ -87,10 +59,7 @@ app.use("/api/patients", patientRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/blog", blogRoutes);
 
-/* ==============================
-   ERROR HANDLER (LAST)
-============================== */
-
+// ERROR HANDLER
 app.use(errorHandler);
 
 export default app;
