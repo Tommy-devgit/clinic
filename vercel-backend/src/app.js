@@ -17,11 +17,22 @@ import patientRoutes from "./routes/patient.routes.js";
 dotenv.config();
 
 const app = express();
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:3000" || "https://rohahospitalmanagement.vercel.app/",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
   }),
 );
@@ -31,6 +42,10 @@ app.use(apiRateLimiter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
+});
+
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", service: "Roha Hospital Backend", basePath: "/api" });
 });
 
 app.use("/api/auth", authRoutes);
