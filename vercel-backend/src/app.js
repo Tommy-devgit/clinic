@@ -17,36 +17,67 @@ import patientRoutes from "./routes/patient.routes.js";
 dotenv.config();
 
 const app = express();
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000")
+
+/* ==============================
+   CORS CONFIGURATION
+============================== */
+
+const allowedOrigins = (process.env.CLIENT_ORIGIN ||
+  "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(helmet());
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
+    origin: function (origin, callback) {
+      // Allow non-browser tools (Postman, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
 
-      callback(new Error(`CORS blocked for origin: ${origin}`));
+      // Do NOT throw error — just reject silently
+      return callback(null, false);
     },
     credentials: true,
-  }),
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
 );
+
+// Explicitly handle preflight requests
+app.options("*", cors());
+
+/* ==============================
+   MIDDLEWARE
+============================== */
+
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(apiRateLimiter);
+
+/* ==============================
+   HEALTH CHECKS
+============================== */
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
 app.get("/", (_req, res) => {
-  res.json({ status: "ok", service: "Roha Hospital Backend", basePath: "/api" });
+  res.json({
+    status: "ok",
+    service: "Roha Hospital Backend",
+    basePath: "/api",
+  });
 });
+
+/* ==============================
+   API ROUTES
+============================== */
 
 app.use("/api/auth", authRoutes);
 app.use("/api/departments", departmentRoutes);
@@ -55,6 +86,10 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/blog", blogRoutes);
+
+/* ==============================
+   ERROR HANDLER (LAST)
+============================== */
 
 app.use(errorHandler);
 
