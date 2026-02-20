@@ -16,8 +16,8 @@ export default async function handler(req, res) {
     databaseReady = true;
   }
 
-  // CORS HEADERS FOR VERCEL
-  const allowedOrigin = "https://rohahospitalmanagement.vercel.app"; // frontend URL
+  // CORS HEADERS – must be set for every request including preflight
+  const allowedOrigin = "https://rohahospitalmanagement.vercel.app"; // your frontend
   res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -29,11 +29,11 @@ export default async function handler(req, res) {
   );
   res.setHeader("Access-Control-Allow-Credentials", "true");
 
-  // HANDLE PRE-FLIGHT
+  // HANDLE PRE-FLIGHT OPTIONS
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.status(200).end(); // respond immediately
   }
 
-  // PASS REQUEST TO EXPRESS
+  // PASS REQUEST TO EXPRESS APP
   return app(req, res);
 }
